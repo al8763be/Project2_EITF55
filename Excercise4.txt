@@ -1,0 +1,2 @@
+Note that the entries CN for the CA and server certificates differ.
+If two certificates share the same CN, it becomes challenging for relying parties to determine which certificate is genuine, increasing the risk of misidentification or impersonation.

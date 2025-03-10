@@ -1,0 +1,26 @@
+Exercise 2 
+
+1. What is the serial number of your certificate ?
+3c:da:8c:45:8d:a0:d8:58:5c:ce:a7:30:ea:20:2c:2f:43:62:11:b9
+
+2. Who is subject and who was the issuer of the certificate?
+Issuer: C=SE, ST=Scania, L=Lund, O=LU, OU=Education, CN=Demo CA, emailAddress=ca@demoland.se
+Subject: C=SE, ST=Scania, L=Lund, O=LU, OU=Education, CN=Demo CA, emailAddress=ca@demoland.se
+aka självcertiferad 
+
+3. What algorithm is used for signing ?
+rsaEncryption
+
+4. What algorithm is used for hashing ?
+sha256WithRSAEncryption
+
+5. What is the public exponent (as decimal number)?
+65537
+
+6. What values do appear as X509v3 extensions? What is the basic constraint?
+ X509v3 extensions:
+   X509v3 Subject Key Identifier:
+   3F:94:F7:17:8C:CE:47:49:27:1F:5B:24:16:0B:C6:A1:DD:4A:45:2E
+   X509v3 Authority Key Identifier:
+   3F:94:F7:17:8C:CE:47:49:27:1F:5B:24:16:0B:C6:A1:DD:4A:45:2E
+   X509v3 Basic Constraints: critical

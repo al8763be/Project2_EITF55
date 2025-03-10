@@ -1,0 +1,9 @@
+In the previous tasks you likely used passwords at several occasions. Reflect on their
+purpose and your choices. What are the consequences of using all these passwords when operating
+a TLS server and client?
+
+Förutsatt att man inte använder samma lösenord till allt och med relativt säker form I istället för bara "server" 
+skapar det ett par extra lager av skydd som gör att det iallafall inte är lönt att bruteforcea eller försöka att 
+stjäla lösenord då det hade tagit hade tagit väldigt lång tid och bara för att man får ta I ett innebär det inte
+att man kan använda det certifikat man vill nå.
+Det lägger dock till complexitet I hanteringen av dessa lösenord för varje component 

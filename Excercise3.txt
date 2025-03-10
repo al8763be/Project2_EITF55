@@ -1,0 +1,33 @@
+1. Use the commands detailed before to generate your server and client certificate. Store these
+certificates and their keys so you know where they are. Do not forget to increment the serial
+number of the certificates. We do this here by hand (but one could let OpenSSL do this for you
+by managing a file where the serial number is stored).
+
+2. Discuss the purpose and features of PKCS12 format in the context of PKI? Discuss it’s advan-
+tages and why it is widely used?
+Simpelt - Packar private key och kedjan av certikat i en encrypterade fil 
+Säkert - Integrerad kryptering och integritet checks gör att filen förblir säker och att användare kan 
+förlita sig på att ingen information har förändrats
+Standardiserat - Etablerad standard gör att man kan flexibelt använda filen I flera Olika miljör utan större problem 
+och säkerställer komplabilitet
+
+
+3. Why should the entries CN= for each certificate be unique?
+Identiska Common names kan leda till problem vid valideringen av certifikat och problem med kollisoner mellan
+Olika certifikat. Båda dessa kan leda till attacker.
+
+4. Investigate the server certificate server_cert.pem and identify the "X509v3 Authority Key
+Identifier". Where have you seen this value before?
+Det är samma key identifier som den för CAroot
+
+5. Repeat the generation of the server certificate so you will get a v1 certificate instead of a v3. Do
+you need to generate a new private key for this?
+Nej det går att återanvända key, det är endast data som tilläggs I v3 
+
+6. Make prints of the certificates and add them as appendices to your report.
+x
+7. Generate also a server certificate that will expire after one day. We will use it later to test if the
+client really checks the expiry data
+
+8. Behöver man ha samma CA? 
+Nej det behöver vara samma CA men båda måste lita på varandras CA, 
