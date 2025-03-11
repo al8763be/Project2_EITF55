@@ -5,22 +5,16 @@ import tempfile
 import threading
 import subprocess
 import sys
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.serialization.pkcs12 import load_key_and_certificates
 
-# Check if the cryptography package is installed
-try:
-    from cryptography.hazmat.primitives import serialization
-    from cryptography.hazmat.primitives.serialization.pkcs12 import load_key_and_certificates
-except ImportError:
-    # If not installed, install the package
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "cryptography"])
-    from cryptography.hazmat.primitives import serialization
-    from cryptography.hazmat.primitives.serialization.pkcs12 import load_key_and_certificates
+
 
 # Configuration
 SERVER_ADDRESS = 'localhost'
 KEY_ALIAS = 'serverdomain'
 SERVER_PORT = 8043
-PKCS12_PATH = 'server_cert/server.p12'  # Update the path to PKCS12 file
+PKCS12_PATH = '../PKI/pki_setup/server/server.p12'  # Update the path to PKCS12 file
 PKCS12_PASSWORD = 'server'
 
 def start_tls_server(address, port, pkcs12_path, pkcs12_password):

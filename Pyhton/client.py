@@ -8,7 +8,7 @@ from cryptography.hazmat.primitives.serialization.pkcs12 import load_key_and_cer
 # Configuration
 SERVER_ADDRESS = 'localhost'
 SERVER_PORT = 8043
-PKCS12_PATH = "../client_cert/client.p12"  # Update the path to PKCS12 file
+PKCS12_PATH = "../PKI/pki_setup/client/client.p12"  # Update the path to PKCS12 file
 PKCS12_PASSWORD = 'client'
 
 def start_tls_client(server_address, port, pkcs12_path, pkcs12_password):
