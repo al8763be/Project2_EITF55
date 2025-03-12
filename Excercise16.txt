@@ -1,0 +1,123 @@
+1.  promtpa användaren för password input 
+1.2 extern konfigurations hantering t.ex password manager. Windows Credential Manager. 
+    Bäst practices är att använda environment variables genom någon typ av secret managment.
+    Då är inte lösenordet del av koden utan måste hämtas från en extern plats som förhoppningsvis
+    påtvingar säkerhets åtgärder som krytpering och tillgänglighets kontroll.
+
+2. Den printar ut alla certikat i kedjan, det är bara att räkna 
+
+3. I och med att vi inte lägger till några nya certifikat i listan eller tar bort något kommer vi att ha samma antal
+ Skulle en "Intermediate CA certiicate" användas hade den landat mellan rootCA och server certifikatet.
+ Ett sådant certifikat är användbart när man vill delegera tilit från rootCA till flera mellanliggande certifikat, 
+ detta gör att man kan lättare hantera hur certifikat utges på ett säkert sätt utan att exponera rot certifikates nycklar. 
+
+4. When using CERT_REQUIRED, the TLS handshake involves the following steps:
+
+Client Certificate Request:
+During the handshake, after the server sends its certificate, the server asks for a certificate from the client. This request is embedded in the TLS protocol.
+
+Client Certificate Presentation:
+The client must provide its certificate. The certificate typically contains a public key and identity information.
+
+Certificate Validation:
+The server checks that the client certificate has been properly issued (for example, it’s signed by the trusted CA loaded into the SSL context via ssl.load_verify_locations). If the certificate doesn’t match or isn’t presented at all, the handshake fails.
+
+Mutual Authentication:
+With CERT_REQUIRED, both sides are authenticated. This is what enabling mutual TLS means. The server verifies that the client is trusted, not just vice versa.
+
+If instead you set the verify mode to CERT_NONE:
+
+No Client Certificate Request:
+The server won’t ask the client for its certificate, even if it’s configured to optionally do so. The TLS handshake will continue without expecting any client credentials.
+
+No Client Certificate Validation:
+Without the requirement, even if a client does supply a certificate, the server won’t enforce its validity. This makes the connection one-sided—the server is authenticated, but the client is not.
+
+In summary, changing from CERT_NONE to CERT_REQUIRED shifts the TLS handshake from a simple server-authenticated connection to a full mutual authentication process, ensuring both the server and client prove their identities.
+
+5. """
+Steps for Project2 Assignment - PKI and TLS Analysis of TLS Traffic:
+
+1. Create a new base directory "pki_setup2" to avoid overwriting existing assets.
+2. Under "pki_setup2", create subdirectories "ca2", "server2", and "client2" for the CA, server, and client.
+3. Generate new keys and certificates:
+   - For the Root CA: generate an RSA key, create a CSR, and self-sign the certificate.
+   - For the Server: generate an RSA key and CSR, create an extension file, and sign the CSR using the new CA.
+   - For the Client: perform similar steps to generate a client certificate.
+4. For the Server PKCS12 file:
+   - Export a new file named "server2.p12" that contains the server's private key and certificate only.
+   - Note: the CA certificate is intentionally omitted.
+5. With mutual TLS authentication enabled in your server code, this omission means that during the TLS handshake, the server
+   will present an incomplete certificate chain. If the client does not already trust the CA, the connection will fail.
+6. Set secure file permissions for all created files.
+
+Dump av server2.pk12: 
+PS C:\Users\Berni\Desktop\Project2_EITF55\PKI\pki_setup2\server2> openssl pkcs12 -in server2.p12 -info -nodes 
+Enter Import Password:
+
+MAC: sha256, Iteration 2048
+MAC length: 32, salt length: 8
+PKCS7 Encrypted data: PBES2, PBKDF2, AES-256-CBC, Iteration 2048, PRF hmacWithSHA256
+Certificate bag
+Bag Attributes
+    localKeyID: 42 22 35 F9 4B 43 DC 1C 05 7E 00 F6 9E 6C 4E B2 E8 8B EC E2
+subject=C=SE, ST=Scania, L=Lund, O=LU, OU=Education, CN=server2.demoland.se, emailAddress=server2@demoland.se     
+issuer=C=SE, ST=Scania, L=Lund, O=LU, OU=Education, CN=Demo CA 2, emailAddress=ca2@demoland.se
+-----BEGIN CERTIFICATE-----
+MIID/zCCAuegAwIBAgIBATANBgkqhkiG9w0BAQsFADCBgjELMAkGA1UEBhMCU0Ux
+DzANBgNVBAgMBlNjYW5pYTENMAsGA1UEBwwETHVuZDELMAkGA1UECgwCTFUxEjAQ
+BgNVBAsMCUVkdWNhdGlvbjESMBAGA1UEAwwJRGVtbyBDQSAyMR4wHAYJKoZIhvcN
+AQkBFg9jYTJAZGVtb2xhbmQuc2UwHhcNMjUwMzEyMTIzNDEzWhcNMjYwMzEyMTIz
+NDEzWjCBkDELMAkGA1UEBhMCU0UxDzANBgNVBAgMBlNjYW5pYTENMAsGA1UEBwwE
+THVuZDELMAkGA1UECgwCTFUxEjAQBgNVBAsMCUVkdWNhdGlvbjEcMBoGA1UEAwwT
+c2VydmVyMi5kZW1vbGFuZC5zZTEiMCAGCSqGSIb3DQEJARYTc2VydmVyMkBkZW1v
+bGFuZC5zZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMwQqQ5oYGrS
+ZQ+nRXutvE2J3k9/cSJbmpaJymQet1ELjhPFQxUzwovhef3U7Y/zkXgoSvKP4sSM
+swWtFxXpwoX/GInHpjny7C0RSsaDDXPJcvB75IwBz5oe8oZyOkF5h+YWDOXKuqnW
+Zz5Vattbm0Dihlc80WdzunC8Qe/EVlaIKaSZRhhnFPSJLuzPIs0EkNhT89mcz2w6
+Itff8ERKDMFdPiqbxUKSfYPCHYfpJnsZL1zQ3F2+2UzbBZkYlnkPQJHhp6X6hnB4
+Q55Fj7Oy3RmVKLclQA++xfX+J5PbC/M1/GB0V+EJasCLWwUblBLXHcS9NJU4BZfy
+myQHmHFGL6UCAwEAAaNwMG4wHwYDVR0jBBgwFoAUGWIeyXXF/gKczEpGSeksiuUy
+VDYwCQYDVR0TBAIwADALBgNVHQ8EBAMCA6gwFAYDVR0RBA0wC4IJbG9jYWxob3N0
+MB0GA1UdDgQWBBTIGdC7nwEyN1MUpiAu8yAYgFV3cTANBgkqhkiG9w0BAQsFAAOC
+AQEAiME/Cahdaqw+7R1XAfxPCJsMYkEab14uOjJfMz/d95viyb5Au+6i+LcmXoQF
+vGEutuLuhAWZz5N2pGzymQDohwAwfCKXtHAKy2U/GU64U2uytiBgZisjIg7uTB5f
+VQ5FfyD7oneBMB9U0TVMhYipDHAnlGQhhGgPHwhm6jO4tgWXk0rt026exryIRzX8
+SQ937UZZcJrik+X4fpgLNilYMSk4v+TNDI/ttfpfvie9GBoTxEHLq9DjRxCUuZ+g
+n5qOOvSOwYGFwnQdybGZyowmEaip0QXI6KOx2M28GfmrbRqxQXeQe+epIMJE9dxD
+E08kG8T9qRmJtfSdCoTBb4dvaw==
+-----END CERTIFICATE-----
+PKCS7 Data
+Shrouded Keybag: PBES2, PBKDF2, AES-256-CBC, Iteration 2048, PRF hmacWithSHA256
+Bag Attributes
+    localKeyID: 42 22 35 F9 4B 43 DC 1C 05 7E 00 F6 9E 6C 4E B2 E8 8B EC E2
+Key Attributes: <No Attributes>
+-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDMEKkOaGBq0mUP
+p0V7rbxNid5Pf3EiW5qWicpkHrdRC44TxUMVM8KL4Xn91O2P85F4KEryj+LEjLMF
+rRcV6cKF/xiJx6Y58uwtEUrGgw1zyXLwe+SMAc+aHvKGcjpBeYfmFgzlyrqp1mc+
+VWrbW5tA4oZXPNFnc7pwvEHvxFZWiCmkmUYYZxT0iS7szyLNBJDYU/PZnM9sOiLX
+3/BESgzBXT4qm8VCkn2Dwh2H6SZ7GS9c0NxdvtlM2wWZGJZ5D0CR4ael+oZweEOe
+RY+zst0ZlSi3JUAPvsX1/ieT2wvzNfxgdFfhCWrAi1sFG5QS1x3EvTSVOAWX8psk
+B5hxRi+lAgMBAAECggEAJNEcryzFuIAdG6XiM141CwhEw7MKhlhgm6hgi4+/IzAi
+gg6k+75K61HS4Kj5827OYA9k9j5fe3anFe8Uqy9xmRtdIf6TTwE0+yyTgR1D4BAI
+XLr9kQUCn5vVxcv2FroGesyfpxXcd6fnGKfwj4MHj71O345peXC3wn80pj2WFiZI
+FPg7GhbLF5zGXtrlNf6lD17YPxlUO+j9+AOp4KrAfuYB3wzt9Sy44DfzuThdPqJ/
+xo6yoRrh2Q8OWBE97iVNriloxK4+PAZy8T8DU0NWj1uu3xg5bQDsraELFigmL4zB
+EuPSakQWk03++RnpvwpoGAtay9FC3FeU+KAWpoVuAQKBgQD5KuXQNdQiSnsu9yhz
+7f9vszIPqQzpBV1x2Aow+sPU7e8+rn2AvXfjcrkoQWyHucJDjyk26d+w/c56u1sr
+DmRM6szsCRU2h94m5bdhyH8jdI/AeLgDeG/0eKJ3m90jR/qrteak0JN76A5LuPkW
+cgUCUH42Qoime79+JpNk2Eeo+QKBgQDRqScpRv45XgUJaElo4FJ8pC6LNK9Z/Zy8
+wXHwYl2pllHr+eR7NTKL7gd8sqcWzzOfDLw7dEWh0JaZ9EQLeSWsN2HVSfNztp3x
+8gSN04BqmpSDuUAEtIdrrN3AGCNmmM7fvjFwP26j3DM5aAB7AmtqCXnShQAdV+c4
+Wi7vNgEzDQKBgQDNlvq2mKOng6MudlrXhQnd5ZKp30e6wWV/+M036sFI4OYl5x3A
+6xSQBGoIcCsXtks3KVnNaJ3c0R7cn9iypxZVbOuW2ku5idPgbmyobyGQZK30Fudm
+XaqqohsT6/REFzEbG2TqmvsGIswg6MgGICBH75ikNrPAAp1Xfobhj59ZKQKBgACW
+sP10rZILqYf1Ov+IYbLn4xmQ9E0UYTRGdsNuA0VOnrxC31lZNOMfr/WxqrZtrn9r
+0bt5ABkMNOAJx4cgt/Jb1XJ72qsggCEFxO2BAoNKG9Ci3IMm3pp2yciYSMEo/Ku0
+JP9jrjPXkm0+1YGC6DpL/IOSzAVJEeUem7MgO7ChAoGBAL8xt7o+hzMvtSXR7nPI
+lSrP9TE9PbLw2qOteB7JdH7ur0a1sHJ+ai4Ff3XLA3FyidGLQX2mGQ/8O/53wZ1Z
+w7W5wLQL/afjRMxzgZesxCisszKyeSa+CxTRb9DzUkaeNl1YmE+qSwFykwmSrTiW
+bQGj0CJkpV9+QBxc73fcw4G0
+-----END PRIVATE KEY-----
+

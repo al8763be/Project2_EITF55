@@ -1,0 +1,2 @@
+ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired
+SSL error: [SSL: TLSV1_ALERT_CERTIFICATE_EXPIRED] tlsv1 alert certificate expired
