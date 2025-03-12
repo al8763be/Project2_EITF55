@@ -8,14 +8,14 @@ import sys
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.serialization.pkcs12 import load_key_and_certificates
 
-
-
 # Configuration
 SERVER_ADDRESS = 'localhost'
 KEY_ALIAS = 'serverdomain'
 SERVER_PORT = 8043
 PKCS12_PATH = '../PKI/pki_setup2/server2/server2.p12'  # Update the path to PKCS12 file
 PKCS12_PASSWORD = 'server'
+# === NEW: Specify the separate CA certificate file path ===
+CA_CERT_PATH = '../PKI/pki_setup2/ca2/rootCA.pem'  # <-- Change this path as needed
 
 def start_tls_server(address, port, pkcs12_path, pkcs12_password):
     cert_path, key_path, ca_path = None, None, None
@@ -31,28 +31,23 @@ def start_tls_server(address, port, pkcs12_path, pkcs12_password):
             encryption_algorithm=serialization.NoEncryption()
         )
         server_cert = certificate.public_bytes(serialization.Encoding.PEM)
+        # ca_cert from PKCS12 is expected to be None since it's not included
         ca_cert = additional_certificates[0].public_bytes(serialization.Encoding.PEM) if additional_certificates else None
         
-        # Create a temporary file for the server certificate and key
-        with (tempfile.NamedTemporaryFile(delete=False) as cert_file,
-              tempfile.NamedTemporaryFile(delete=False) as key_file,
-              tempfile.NamedTemporaryFile(delete=False) as ca_file):
+        # Create temporary files for the server certificate and key
+        with tempfile.NamedTemporaryFile(delete=False) as cert_file, \
+             tempfile.NamedTemporaryFile(delete=False) as key_file:
             cert_file.write(server_cert)
             cert_path = cert_file.name
             key_file.write(server_key)
             key_path = key_file.name
-            # Load the CA certificate for client authentication, when needed
-            if ca_cert:
-                ca_file.write(ca_cert)
-                ca_path = ca_file.name
-
+        
         # Create an SSL context
         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
         context.load_cert_chain(certfile=cert_path, keyfile=key_path)
-        if ca_cert:
-            context.load_verify_locations(cafile=ca_path)
-        else:
-            raise RuntimeError("CA certificate not found")
+        
+        # === CHANGED: Instead of using ca_cert from the PKCS12 file, load it from CA_CERT_PATH ===
+        context.load_verify_locations(cafile=CA_CERT_PATH)
         
         # Change this to CERT_REQUIRED to enable mutual TLS
         context.verify_mode = ssl.CERT_REQUIRED
@@ -90,4 +85,3 @@ def run_server():
 thread = threading.Thread(target=run_server, daemon=True)
 thread.start()
 thread.join()
-
