@@ -23,7 +23,7 @@ def start_tls_server(address, port, pkcs12_path, pkcs12_password):
         p12_password_bytes = pkcs12_password.encode('utf-8')
         with open(pkcs12_path, 'rb') as f:
             private_key, certificate, additional_certificates = load_key_and_certificates(f.read(), p12_password_bytes)
-        
+
         # Extract the private key and certificate in PEM format
         server_key = private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
@@ -33,7 +33,7 @@ def start_tls_server(address, port, pkcs12_path, pkcs12_password):
         server_cert = certificate.public_bytes(serialization.Encoding.PEM)
         # ca_cert from PKCS12 is expected to be None since it's not included
         ca_cert = additional_certificates[0].public_bytes(serialization.Encoding.PEM) if additional_certificates else None
-        
+
         # Create temporary files for the server certificate and key
         with tempfile.NamedTemporaryFile(delete=False) as cert_file, \
              tempfile.NamedTemporaryFile(delete=False) as key_file:
@@ -41,17 +41,19 @@ def start_tls_server(address, port, pkcs12_path, pkcs12_password):
             cert_path = cert_file.name
             key_file.write(server_key)
             key_path = key_file.name
-        
+
         # Create an SSL context
         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        context.keylog_filename = "sslkeylog.log"
         context.load_cert_chain(certfile=cert_path, keyfile=key_path)
-        
+
         # === CHANGED: Instead of using ca_cert from the PKCS12 file, load it from CA_CERT_PATH ===
         context.load_verify_locations(cafile=CA_CERT_PATH)
-        
+        context.set_ciphers("ECDHE-RSA-AES128-GCM-SHA256")
+
         # Change this to CERT_REQUIRED to enable mutual TLS
         context.verify_mode = ssl.CERT_REQUIRED
-        
+
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
             sock.bind((address, port))
             sock.listen(1)

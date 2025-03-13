@@ -1,15 +1,15 @@
-1.  promtpa användaren för password input 
-1.2 extern konfigurations hantering t.ex password manager. Windows Credential Manager. 
+1.  promtpa användaren för password input
+1.2 extern konfigurations hantering t.ex password manager. Windows Credential Manager.
     Bäst practices är att använda environment variables genom någon typ av secret managment.
     Då är inte lösenordet del av koden utan måste hämtas från en extern plats som förhoppningsvis
     påtvingar säkerhets åtgärder som krytpering och tillgänglighets kontroll.
 
-2. Den printar ut alla certikat i kedjan, det är bara att räkna 
+2. Den printar ut alla certikat i kedjan, det är bara att räkna
 
 3. I och med att vi inte lägger till några nya certifikat i listan eller tar bort något kommer vi att ha samma antal
  Skulle en "Intermediate CA certiicate" användas hade den landat mellan rootCA och server certifikatet.
- Ett sådant certifikat är användbart när man vill delegera tilit från rootCA till flera mellanliggande certifikat, 
- detta gör att man kan lättare hantera hur certifikat utges på ett säkert sätt utan att exponera rot certifikates nycklar. 
+ Ett sådant certifikat är användbart när man vill delegera tilit från rootCA till flera mellanliggande certifikat,
+ detta gör att man kan lättare hantera hur certifikat utges på ett säkert sätt utan att exponera rot certifikates nycklar.
 
 4. When using CERT_REQUIRED, the TLS handshake involves the following steps:
 
@@ -51,8 +51,8 @@ Steps for Project2 Assignment - PKI and TLS Analysis of TLS Traffic:
    will present an incomplete certificate chain. If the client does not already trust the CA, the connection will fail.
 6. Set secure file permissions for all created files.
 
-Dump av server2.pk12: 
-PS C:\Users\Berni\Desktop\Project2_EITF55\PKI\pki_setup2\server2> openssl pkcs12 -in server2.p12 -info -nodes 
+Dump av server2.pk12:
+PS C:\Users\Berni\Desktop\Project2_EITF55\PKI\pki_setup2\server2> openssl pkcs12 -in server2.p12 -info -nodes
 Enter Import Password:
 
 MAC: sha256, Iteration 2048
@@ -61,7 +61,7 @@ PKCS7 Encrypted data: PBES2, PBKDF2, AES-256-CBC, Iteration 2048, PRF hmacWithSH
 Certificate bag
 Bag Attributes
     localKeyID: 42 22 35 F9 4B 43 DC 1C 05 7E 00 F6 9E 6C 4E B2 E8 8B EC E2
-subject=C=SE, ST=Scania, L=Lund, O=LU, OU=Education, CN=server2.demoland.se, emailAddress=server2@demoland.se     
+subject=C=SE, ST=Scania, L=Lund, O=LU, OU=Education, CN=server2.demoland.se, emailAddress=server2@demoland.se
 issuer=C=SE, ST=Scania, L=Lund, O=LU, OU=Education, CN=Demo CA 2, emailAddress=ca2@demoland.se
 -----BEGIN CERTIFICATE-----
 MIID/zCCAuegAwIBAgIBATANBgkqhkiG9w0BAQsFADCBgjELMAkGA1UEBhMCU0Ux
@@ -120,4 +120,3 @@ lSrP9TE9PbLw2qOteB7JdH7ur0a1sHJ+ai4Ff3XLA3FyidGLQX2mGQ/8O/53wZ1Z
 w7W5wLQL/afjRMxzgZesxCisszKyeSa+CxTRb9DzUkaeNl1YmE+qSwFykwmSrTiW
 bQGj0CJkpV9+QBxc73fcw4G0
 -----END PRIVATE KEY-----
-
